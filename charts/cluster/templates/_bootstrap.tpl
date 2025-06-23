@@ -106,6 +106,39 @@ externalClusters:
       {{- include "cluster.barmanObjectStoreConfig" $d | nindent 4 }}
     {{- end }}
 {{- end }}
+
+{{- else if eq .Values.mode "replica" -}}
+bootstrap:
+{{- if eq .Values.replica.bootstrapMethod "pg_basebackup" }}
+  pg_basebackup:
+    source: {{ coalesce .Values.replica.remoteCluster.name  "remote" }}
+    {{- with .Values.cluster.initdb.database }}
+    database: {{ . }}
+    {{- end }}
+    {{- with .Values.cluster.initdb.owner }}
+    owner: {{ . }}
+    {{- end }}
+    {{- with .Values.cluster.initdb.secret }}
+    secret:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+{{- else -}}
+  {{fail "Invalid replica bootstrap method!" }}
+{{- end }}
+
+replica: {} # TODO
+
+externalClusters:
+  {{- if or (not .Values.replica.mode) (eq .Values.replica.mode "standalone") }}
+    {{- include "cluster.externalCluster" (list (coalesce .Values.replica.remoteCluster.name  "remote") .Values.replica.remoteCluster.source ) | nindent 2 }}
+  {{- else if eq .Values.replica.mode "distributed" }}
+    {{ fail "Distributed replica mode is not supported " }}
+    {{- include "cluster.externalCluster" (list (coalesce .Values.replica.remoteCluster.name  "remote") .Values.replica.remoteCluster.source ) | nindent 2 }}
+    {{- include "cluster.externalCluster" (list (coalesce .Values.replica.localCluster.name  "local") .Values.replica.localCluster.source ) | nindent 2 }}
+  {{- else }}
+    {{ fail "Invalid replica mode!" }}
+  {{- end }}
+
 {{-  else }}
   {{ fail "Invalid cluster mode!" }}
 {{- end }}

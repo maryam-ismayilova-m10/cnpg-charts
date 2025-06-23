@@ -23,7 +23,7 @@ version:
 ###
 # -- Cluster mode of operation. Available modes:
 # * `standalone` - default mode. Creates new or updates an existing CNPG cluster.
-# * `replica` - Creates a replica cluster from an existing CNPG cluster. # TODO
+# * `replica` - Creates a replica cluster from an existing CNPG cluster. #  INFRA-2632
 # * `recovery` - Same as standalone but creates a cluster from a backup, object store or via pg_basebackup.
 mode: standalone
 
@@ -178,6 +178,185 @@ recovery:
       sslRootCertSecret:
         name: ""
         key: ""
+
+replica:
+
+  # -- Bootstrap method for replica mode. Possible values:
+  #    - pg_basebackup: Use streaming replication from a source cluster
+  #    - recoveryObjectStore: Use object store recovery (barman object store)
+  bootstrapMethod: pg_basebackup
+  # Specifies the operating mode of the replica cluster.
+  # Allowed values:
+  #   - standalone (default): Runs the cluster in standalone mode.
+  #   - distributed: Runs the cluster in distributed mode.
+  mode: standalone
+  remoteCluster:
+    # -- Name of the remote cluster to connect to.
+    name: ""
+    # -- Name of the database used by the application. Default: `app`.
+    database: app
+    # -- Name of the secret containing the initial credentials for the owner of the user database. If empty a new secret will be created from scratch
+    secret: ""
+    # -- Name of the owner of the database in the instance to be used by applications. Defaults to the value of the `database` key.
+    owner: ""
+    source:
+      clusterName: ""
+      objectStore:
+        enabled: false
+        # -- Overrides the provider specific default endpoint. Defaults to:
+        # S3: https://s3.<region>.amazonaws.com"
+        # Leave empty if using the default S3 endpoint
+        endpointURL: ""
+        # -- Specifies a CA bundle to validate a privately signed certificate.
+        endpointCA:
+          # -- Creates a secret with the given value if true, otherwise uses an existing secret.
+          create: false
+          name: ""
+          key: ""
+          value: ""
+        # -- Overrides the provider specific default path. Defaults to:
+        # S3: s3://<bucket><path>
+        # Azure: https://<storageAccount>.<serviceName>.core.windows.net/<containerName><path>
+        # Google: gs://<bucket><path>
+        destinationPath: ""
+        # -- One of `s3`, `azure` or `google`
+        provider: s3
+        s3:
+          region: ""
+          bucket: ""
+          path: "/"
+          accessKey: ""
+          secretKey: ""
+          # -- Use the role based authentication without providing explicitly the keys
+          inheritFromIAMRole: false
+        azure:
+          path: "/"
+          connectionString: ""
+          storageAccount: ""
+          storageKey: ""
+          storageSasToken: ""
+          containerName: ""
+          serviceName: blob
+          inheritFromAzureAD: false
+        google:
+          path: "/"
+          bucket: ""
+          gkeEnvironment: false
+          applicationCredentials: ""
+        secret:
+          # -- Whether to create a secret for the backup credentials
+          create: true
+          # -- Name of the backup credentials secret
+          name: ""
+
+      streaming:
+        host: ""
+        port: 5432
+        username: ""
+        database: "app"
+        sslMode: "disable"
+        passwordSecret:
+          # -- Whether to create a secret for the password
+          create: false
+          # -- Name of the secret containing the password
+          name: ""
+          # -- The key in the secret containing the password
+          key: "password"
+          # -- The password value to use when creating the secret
+          value: ""
+        sslKeySecret:
+          name: ""
+          key: ""
+        sslCertSecret:
+          name: ""
+          key: ""
+        sslRootCertSecret:
+          name: ""
+          key: ""
+  localCluster:
+    # -- Name of the local cluster to connect to.
+    name: ""
+    # -- Name of the database used by the application. Default: `app`.
+    database: app
+    # -- Name of the secret containing the initial credentials for the owner of the user database. If empty a new secret will be created from scratch
+    secret: ""
+    # -- Name of the owner of the database in the instance to be used by applications. Defaults to the value of the `database` key.
+    owner: ""
+    source:
+      clusterName: ""
+      objectStore:
+        enabled: false
+        # -- Overrides the provider specific default endpoint. Defaults to:
+        # S3: https://s3.<region>.amazonaws.com"
+        # Leave empty if using the default S3 endpoint
+        endpointURL: ""
+        # -- Specifies a CA bundle to validate a privately signed certificate.
+        endpointCA:
+          # -- Creates a secret with the given value if true, otherwise uses an existing secret.
+          create: false
+          name: ""
+          key: ""
+          value: ""
+        # -- Overrides the provider specific default path. Defaults to:
+        # S3: s3://<bucket><path>
+        # Azure: https://<storageAccount>.<serviceName>.core.windows.net/<containerName><path>
+        # Google: gs://<bucket><path>
+        destinationPath: ""
+        # -- One of `s3`, `azure` or `google`
+        provider: s3
+        s3:
+          region: ""
+          bucket: ""
+          path: "/"
+          accessKey: ""
+          secretKey: ""
+          # -- Use the role based authentication without providing explicitly the keys
+          inheritFromIAMRole: false
+        azure:
+          path: "/"
+          connectionString: ""
+          storageAccount: ""
+          storageKey: ""
+          storageSasToken: ""
+          containerName: ""
+          serviceName: blob
+          inheritFromAzureAD: false
+        google:
+          path: "/"
+          bucket: ""
+          gkeEnvironment: false
+          applicationCredentials: ""
+        secret:
+          # -- Whether to create a secret for the backup credentials
+          create: true
+          # -- Name of the backup credentials secret
+          name: ""
+
+      streaming:
+        host: ""
+        port: 5432
+        username: ""
+        database: "app"
+        sslMode: "disable"
+        passwordSecret:
+          # -- Whether to create a secret for the password
+          create: false
+          # -- Name of the secret containing the password
+          name: ""
+          # -- The key in the secret containing the password
+          key: "password"
+          # -- The password value to use when creating the secret
+          value: ""
+        sslKeySecret:
+          name: ""
+          key: ""
+        sslCertSecret:
+          name: ""
+          key: ""
+        sslRootCertSecret:
+          name: ""
+          key: ""
+
 
 
 cluster:
