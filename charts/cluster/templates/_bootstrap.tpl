@@ -122,7 +122,7 @@ bootstrap:
     secret:
       {{- toYaml . | nindent 6 }}
     {{- end }}
-{{- if eq .Values.replica.bootstrapMethod "objectStore" }}
+{{- else if eq .Values.replica.bootstrapMethod "objectStore" }}
   recovery:
     source: {{ coalesce .Values.replica.remoteCluster.name  "remote" }}
     {{- with .Values.cluster.initdb.database }}
