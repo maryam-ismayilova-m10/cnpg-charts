@@ -126,13 +126,35 @@ bootstrap:
   {{fail "Invalid replica bootstrap method!" }}
 {{- end }}
 
-replica: {} # TODO
+replica:
+  source: {{ coalesce .Values.replica.remoteCluster.name  "remote" }}
+
+{{- if eq .Values.replica.mode "standalone" }}
+  enabled: {{ .Values.replica.enabled }}
+{{- end }}
+{{- if eq .Values.replica.mode "distributed" }}
+  self: {{ coalesce .Values.replica.localCluster.name  "local" }}
+  {{- if not .Values.replica.primaryCluster }}
+    {{ fail "replica.primaryCluster must be set when replica.mode is distributed" }}
+  {{- else }}
+  primary: {{ .Values.replica.primaryCluster }}
+  {{- end }}
+{{- end }}  
+  
+  {{- with .Values.replica.promotionToken }}
+  promotionToken: {{ . }}
+  {{- end }}
+
+  {{- with .Values.replica.minApplyDelay }}
+  minApplyDelay: {{ . }}
+  {{- end }}
+
 
 externalClusters:
   {{- if or (not .Values.replica.mode) (eq .Values.replica.mode "standalone") }}
     {{- include "cluster.externalCluster" (list (coalesce .Values.replica.remoteCluster.name  "remote") .Values.replica.remoteCluster.source ) | nindent 2 }}
   {{- else if eq .Values.replica.mode "distributed" }}
-    {{ fail "Distributed replica mode is not supported " }}
+    {{- fail "Distributed mode is not supported by this chart yet" }}
     {{- include "cluster.externalCluster" (list (coalesce .Values.replica.remoteCluster.name  "remote") .Values.replica.remoteCluster.source ) | nindent 2 }}
     {{- include "cluster.externalCluster" (list (coalesce .Values.replica.localCluster.name  "local") .Values.replica.localCluster.source ) | nindent 2 }}
   {{- else }}

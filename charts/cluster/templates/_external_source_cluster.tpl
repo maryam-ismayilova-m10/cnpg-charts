@@ -38,6 +38,7 @@
 {{- $streamingConfig := $config.streaming -}}
 {{- $s3Config := $config.objectStore -}}
 - name: {{ first . }}
+  {{- if $streamingConfig.enabled }}
   connectionParameters:
     host: {{ $streamingConfig.host | quote }}
     port: {{ $streamingConfig.port | quote }}
@@ -66,6 +67,8 @@
     name: {{ $streamingConfig.sslRootCertSecret.name }}
     key: {{ $streamingConfig.sslRootCertSecret.key }}
   {{- end }}
+  {{- end }}
+  
   {{- if $s3Config.enabled }}
   barmanObjectStore:
     serverName: {{ coalesce $s3Config.serverName  $config.clusterName $name }}
