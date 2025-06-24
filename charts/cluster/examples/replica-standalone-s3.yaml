@@ -1,0 +1,31 @@
+type: postgresql
+mode: replica
+
+cluster:
+  instances: 1
+
+replica:
+  bootstrapMethod: objectStore
+  mode: standalone
+  remoteCluster:
+    name: remote-cluster-name
+    source:
+      objectStore:
+        enabled: true
+        secret:
+          create: false
+          name: remote-s3-creds
+        serverName: remote-cluster-s3-server-name
+        s3:
+          region: eu-central-1
+          bucket: backup-storage
+          path: /backups/
+          s3Credentials:
+            accessKeyId:
+              name: remote-s3-creds
+              key: ACCESS_KEY_ID
+            secretAccessKey:
+              name: remote-s3-creds
+              key: ACCESS_SECRET_KEY
+      streaming:
+        enabled: false

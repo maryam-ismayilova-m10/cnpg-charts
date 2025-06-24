@@ -1,0 +1,19 @@
+type: postgresql
+mode: replica
+
+cluster:
+  instances: 1
+
+replica:
+  bootstrapMethod: pg_basebackup
+  mode: standalone
+  remoteCluster:
+    name: remote-cluster-name
+    source:
+      streaming:
+        host: remote-cluster-host
+        database: app
+        username: app
+        passwordSecret:
+          create: false
+          name: remote-cluster-creds
