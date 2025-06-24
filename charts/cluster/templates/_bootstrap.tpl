@@ -122,6 +122,19 @@ bootstrap:
     secret:
       {{- toYaml . | nindent 6 }}
     {{- end }}
+{{- if eq .Values.replica.bootstrapMethod "objectStore" }}
+  recovery:
+    source: {{ coalesce .Values.replica.remoteCluster.name  "remote" }}
+    {{- with .Values.cluster.initdb.database }}
+    database: {{ . }}
+    {{- end }}
+    {{- with .Values.cluster.initdb.owner }}
+    owner: {{ . }}
+    {{- end }}
+    {{- with .Values.cluster.initdb.secret }}
+    secret:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
 {{- else -}}
   {{fail "Invalid replica bootstrap method!" }}
 {{- end }}

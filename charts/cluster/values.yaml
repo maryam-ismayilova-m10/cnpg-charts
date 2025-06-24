@@ -183,7 +183,7 @@ replica:
 
   # -- Bootstrap method for replica mode. Possible values:
   #    - pg_basebackup: Use streaming replication from a source cluster
-  #    - recoveryObjectStore: Use object store recovery (barman object store)
+  #    - objectStore: Use object store recovery (barman object store)
   bootstrapMethod: pg_basebackup
   # Specifies the operating mode of the replica cluster.
   # Allowed values:
